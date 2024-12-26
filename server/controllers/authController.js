@@ -30,7 +30,13 @@ const register = async (req, res) => {
     role,
     verificationToken,
   });
-
+  const origin = "http://localhost:3000";
+  await sendVerificationEmail({
+    name: user.name,
+    email: user.email,
+    verificationToken: user.verificationToken,
+    origin,
+  });
   // Send Verification Token : For Postman Testing Only
   res.status(StatusCodes.CREATED).json({
     msg: "Sucesss !  , Please Check you email to verify",
