@@ -47,6 +47,10 @@ const login = async (req, res) => {
   if (!isPasswordCorrect) {
     throw new CustomError.UnauthenticatedError("Invalid Credentials");
   }
+
+  if (user.isVerified === false) {
+    throw new CustomError.UnauthenticatedError("Please Verify First");
+  }
   const tokenUser = createTokenUser(user);
   attachCookiesToResponse({ res, user: tokenUser });
 
