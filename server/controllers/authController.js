@@ -1,10 +1,13 @@
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
-const { attachCookiesToResponse, createTokenUser } = require("../utils");
+const {
+  attachCookiesToResponse,
+  createTokenUser,
+  sendVerificationEmail,
+} = require("../utils");
 
 const crypto = require("crypto");
-const sendEmail = require("../utils/sendEmail");
 
 const register = async (req, res) => {
   const { email, name, password } = req.body;
@@ -76,7 +79,7 @@ const login = async (req, res) => {
   if (user.isVerified === false) {
     throw new CustomError.UnauthenticatedError("Please Verify First");
   }
-  await sendEmail();
+
   const tokenUser = createTokenUser(user);
   attachCookiesToResponse({ res, user: tokenUser });
 
