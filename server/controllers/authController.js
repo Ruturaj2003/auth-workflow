@@ -8,6 +8,7 @@ const {
 } = require("../utils");
 
 const crypto = require("crypto");
+const Token = require("../models/Token");
 
 const register = async (req, res) => {
   const { email, name, password } = req.body;
@@ -87,9 +88,30 @@ const login = async (req, res) => {
   }
 
   const tokenUser = createTokenUser(user);
-  attachCookiesToResponse({ res, user: tokenUser });
 
-  res.status(StatusCodes.OK).json({ user: tokenUser });
+  // Create Refresh Token
+
+  let refrehToken = "";
+
+  // Check for exisitng token
+
+  refreshToken = crypto.randomBytes(40).toString("hex");
+
+  const userAgent = req.headers["user-agent"];
+
+  const ip = req.ip;
+
+  const userToken = {
+    refreshToken,
+    ip,
+    userAgent,
+    user: user._id,
+  };
+
+  const token = await Token.create(userToken);
+  // attachCookiesToResponse({ res, user: tokenUser });
+
+  res.status(StatusCodes.OK).json({ user: tokenUser, token });
 };
 const logout = async (req, res) => {
   res.cookie("token", "logout", {
