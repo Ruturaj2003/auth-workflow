@@ -6,6 +6,7 @@ const {
   createTokenUser,
   sendVerificationEmail,
   sendResetPassword,
+  hashString,
 } = require("../utils");
 
 const crypto = require("crypto");
@@ -163,7 +164,7 @@ const forgotPassword = async (req, res) => {
     const tenMin = 1000 * 60 * 10;
     const passwordTokenExpirationDate = new Date(Date.now() + tenMin);
 
-    user.passwordToken = passwordToken;
+    user.passwordToken = hashString(passwordToken);
     user.passwordTokenExpirationDate = passwordTokenExpirationDate;
     await user.save();
   }
@@ -181,7 +182,7 @@ const resetPassword = async (req, res) => {
   if (user) {
     const currentDate = new Date();
     if (
-      user.passwordToken === token &&
+      user.passwordToken === hashString(token) &&
       user.passwordTokenExpirationDate > currentDate
     ) {
       user.password = password;
