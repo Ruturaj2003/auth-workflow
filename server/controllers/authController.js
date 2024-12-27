@@ -79,6 +79,7 @@ const login = async (req, res) => {
     throw new CustomError.UnauthenticatedError("Invalid Credentials");
   }
   const isPasswordCorrect = await user.comparePassword(password);
+
   if (!isPasswordCorrect) {
     throw new CustomError.UnauthenticatedError("Invalid Credentials");
   }
@@ -89,11 +90,21 @@ const login = async (req, res) => {
 
   const tokenUser = createTokenUser(user);
 
-  // Create Refresh Token
-
-  let refreshToken = "";
-
   // Check for exisitng token
+  let refreshToken = "";
+  const exisitingToken = await Token.findOne({ user: user._id });
+
+  if (exisitingToken) {
+    const { isValid } = exisitingToken;
+    if (!isValid) {
+      throw new CustomError.UnauthenticatedError("Invalid Creds");
+    }
+    refreshToken = exisitingToken.refreshToken;
+    attachCookiesToResponse({ res, user: tokenUser, refreshToken });
+
+    res.status(StatusCodes.OK).json({ user: tokenUser });
+    return;
+  }
 
   refreshToken = crypto.randomBytes(40).toString("hex");
 
@@ -107,8 +118,8 @@ const login = async (req, res) => {
     userAgent,
     user: user._id,
   };
-
   const token = await Token.create(userToken);
+
   attachCookiesToResponse({ res, user: tokenUser, refreshToken });
 
   res.status(StatusCodes.OK).json({ user: tokenUser, token });
