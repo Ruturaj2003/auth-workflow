@@ -91,7 +91,7 @@ const login = async (req, res) => {
 
   // Create Refresh Token
 
-  let refrehToken = "";
+  let refreshToken = "";
 
   // Check for exisitng token
 
@@ -109,7 +109,7 @@ const login = async (req, res) => {
   };
 
   const token = await Token.create(userToken);
-  // attachCookiesToResponse({ res, user: tokenUser });
+  attachCookiesToResponse({ res, user: tokenUser, refreshToken });
 
   res.status(StatusCodes.OK).json({ user: tokenUser, token });
 };
