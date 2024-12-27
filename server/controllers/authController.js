@@ -141,11 +141,21 @@ const logout = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: "user logged out!" });
 };
 
+const forgotPassword = async (req, res) => {
+  res.send("I forgot");
+};
+
+const resetPassword = async (req, res) => {
+  res.send("I reset");
+};
+
 module.exports = {
   register,
   login,
   logout,
   verifyEmail,
+  forgotPassword,
+  resetPassword,
 };
 // const tokenUser = createTokenUser(user);
 // attachCookiesToResponse({ res, user: tokenUser });
